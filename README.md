@@ -25,6 +25,21 @@ instead be sampled nearest-neighbor (`--filter`), which turns it into a block
 format; with `--qat B` the first level becomes a per-pixel B-bit selector
 chosen by exhaustive search (see [A learned block format](#a-learned-block-format)).
 
+Since September 6, 2026 the first level can also be an 8×8 **DCT-coded
+selector plane** (`--dct-q Q`), trained through its quantizer by the same ES
+with a rate term in the objective (see [DCT-coded selectors, the rate proxy
+and the packed container](#dct-coded-selectors-the-rate-proxy-and-the-packed-container)).
+Two things about it are worth knowing before the details. Each block's
+**quantizer step is set by the decoder's sensitivity, not by the block's
+transform energy**: the trainer perturbs the block's coefficients, measures
+the change in the decoded image, and gives blocks whose latent errors the MLP
+amplifies a finer 4-bit scale code (refitted as training goes on), so the
+quantization follows the true distortion through the decoder rather than a
+source-statistics stand-in. And the **rate is inside the ES objective**: the
+latent perturbations are charged the bit cost of the symbols they would
+produce, so the latent itself is trained toward cheaper coefficients instead
+of being pruned afterwards.
+
 ## Results
 
 **How bitrates are reported.** Every run prints three bitrates, and the

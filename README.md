@@ -958,10 +958,11 @@ Test platform: NVIDIA GeForce RTX 5090 (32 GB, driver 581.80), CUDA 13.1
 (nvcc 13.1.80), Windows 11 Pro build 26200, Visual Studio 2022 Community
 (MSVC 19.44), CMake 4.1.1.
 
-Measured on an RTX 5090 (model.png, 3,1-bit selectors + 128x128x4 block,
-6000 iterations, annealing + finite differences): 45 s against 1150 s on a
-32-thread CPU, 232 it/s in the ES phase and about 60 it/s in the FD phase.
-Final PSNR 36.32 / 36.83 dB for two seeds against the CPU's 36.67 dB: the
+Measured on an RTX 5090 (chief1, 3,1-bit selectors + 128×128×4 block,
+36,36 decoder, 6000 iterations, annealing + finite differences; re-run
+from this repository's build): 64 s against 1624 s on a 32-thread CPU,
+234 it/s in the ES phase and about 94 it/s in the FD phase. Final PSNR
+40.87 / 40.33 dB for two seeds against the CPU's 40.84 dB: the
 GPU draws different random numbers, so the runs are different ES samples of
 the same objective, and agree within the seed spread. The 4-texture material
 at 3x2-bit selectors takes 30 s for 3000 iterations (30.16 dB, CPU 30.05),
@@ -1143,8 +1144,8 @@ same PSNR (`--load model.bin --iters 0`, with and without `--cuda`), and a
 CPU run with `--rng hash` must track a `--cuda` run with the same seed to
 display precision over a few hundred iterations, since both then draw the
 same perturbations. Longer runs are compared against the seed spread: two
-GPU seeds bracketed the CPU result on the 6000-iteration model.png
-reference (36.32 / 36.83 dB against 36.67 dB). With `--qes` on, 500
+GPU seeds bracketed the CPU result on the 6000-iteration chief1
+reference (40.87 / 40.33 dB against 40.84 dB). With `--qes` on, 500
 iterations on chief1 with `--rng hash` and the default `--qes-start 0.5`:
 CPU 31.30 dB against GPU 31.29 dB for `--qat 2 --qes 0,8` on the 8×8-block
 layout, and 26.95 against 26.94 dB for `--qes 6,8` on two bilinear levels,

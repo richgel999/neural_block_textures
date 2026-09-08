@@ -1687,6 +1687,54 @@ to 1-5 bits/channel, and has 1-3 channels (typically 1 for a single texture, 2-3
 * Training a 2 level neural block texture like this is essentially like a hybrid between traditional GPU textures and neural textures. The training program uses exhaustive evaluation in each training step to determine the best "selectors" to use given the current latent and MLP weights.
 * Bilinear sampling the "colors" latent is conceptually like how the PVRTC1 texture format works (the block color endpoints are linearly filtered). Using nearest neighbor (point sampling) is more like how BC1-7 work (the block color endpoints are only used within the block they are assigned to).
 
+### Neural block textures vs. GPU textures (blog post of September 6, 2026)
+
+Published September 6, 2026 as the post "Neural block textures vs. GPU
+textures" (richg42.blogspot.com), and disclosed here as prior art:
+
+* The first step beyond GPU textures keeps the GPU-texture-style latent and
+  replaces the fixed hardware decoder (BC1-7, ASTC) with a configurable MLP,
+  with PVRTC1-like bilinear sampling of the block "colour" endpoints (PVRTC1
+  holds them at 1/4 resolution). The MLP gives as many output channels as
+  needed; the "colours" latent has a flexible number of channels (typically
+  2-4) and has been tested at 1/4, 1/6, 1/8 and 1/16 of the texture
+  resolution. The per-texel "selectors" / "weights" are unchanged in spirit:
+  1 channel for a single texture, 2-3 for a material, 1-5 bits per channel,
+  possibly a different bit depth on each channel.
+* The "encoder" is the training step (backprop or ES); ES on the per-texel
+  and lower-resolution latents is easily optimized at this MLP size. Even on
+  a single texture the bitrate and quality are roughly competitive with
+  transform methods on GPU-texture latents, and the design scales to
+  materials, where the decoding cost is amortized across the material: the
+  more channels the MLP outputs, the lower the effective bitrate. About
+  250-1200 MLP weights is a good range, small enough to implement directly
+  in GPU hardware. For inference on load on the CPU, threading and SIMD
+  suffice; no side-band data (as NTC uses) is needed for fast full-format
+  BC7 encoding, which bc7f already solves. Training runs on CUDA with a CPU
+  SIMD fallback.
+* **Measured against two real BC7 encoders at a matched 8.0 bpp** (neural
+  8.02 bpp including the quantized latents and all MLP weights as fp16) on
+  a single complex 1080×1080 photo:
+
+  | Encoder | PSNR |
+  |---|---|
+  | Neural block texture | 43.15 dB |
+  | bc7f (analytical) | 43.78 dB |
+  | bc7e_scalar level 0 | 41.03 dB |
+  | bc7e_scalar level 1 | 44.85 dB |
+  | bc7e_scalar level 2 | 44.67 dB |
+  | bc7e_scalar level 3 | 45.18 dB |
+  | bc7e_scalar level 6 (slowest) | 45.59 dB |
+
+  Neural configuration: per-texel selectors 2 channels at 4 + 2 bits (6 bits
+  per texel); 1/4-resolution colours latent, 4 channels at 8 bits (32 bits);
+  MLP 1,083 weights; quantization-aware training, ES + central differences,
+  8000 iterations, 106 s on an RTX 5090. The point of the experiment: at an
+  equal, very high bitrate this format and trainer match, or come very close
+  to, a highly tuned and widely deployed BC7 encoder, while unlike any GPU
+  texture format the design scales down to low bitrates and out to
+  multi-channel PBR materials on the same latents.
+
 ## Prior art disclosure: Updated Sept. 8, 2026
 
 Everything below was implemented and measured in the private working tree

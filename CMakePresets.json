@@ -1,0 +1,28 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "cpu",
+      "displayName": "CPU only (Visual Studio 2022, x64)",
+      "generator": "Visual Studio 17 2022",
+      "architecture": { "value": "x64", "strategy": "set" },
+      "binaryDir": "${sourceDir}/build"
+    },
+    {
+      "name": "cuda",
+      "displayName": "CPU + CUDA backend (Visual Studio 2022, x64, CUDA 13.1)",
+      "generator": "Visual Studio 17 2022",
+      "architecture": { "value": "x64", "strategy": "set" },
+      "toolset": { "value": "cuda=13.1,host=x64", "strategy": "set" },
+      "binaryDir": "${sourceDir}/build_cuda",
+      "cacheVariables": {
+        "NTC_CUDA": "ON",
+        "CUDAToolkit_ROOT": "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.1"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "cpu", "configurePreset": "cpu", "configuration": "Release" },
+    { "name": "cuda", "configurePreset": "cuda", "configuration": "Release" }
+  ]
+}

@@ -1113,7 +1113,7 @@ nonzero learning rate. It is run on every configuration family a change could
 affect, for example:
 
 ```
-ntc model.png --cuda --cuda-check --latent 512 512 2 --latent2 128 128 4 --filter nearest,nearest --pos lv1local --qat 3,1 --mlp 36,36 --iters 1 --out out_chk
+ntc chief1.png --cuda --cuda-check --latent 512 512 2 --latent2 128 128 4 --filter nearest,nearest --pos lv1local --qat 3,1 --mlp 36,36 --iters 1 --out out_chk
 ntc --cuda --cuda-check --iters 1 --out out_chk                      # default bilinear 64x64x4
 ntc m1.png m2.png m3.png m4.png --cuda --cuda-check --latent 512 512 3 --latent2 128 128 4 --filter nearest,nearest --pos lv1local --qat 2 --mlp 36,36 --iters 1 --out out_chk
 ntc chief1.png --cuda --cuda-check --block 8 --latent 0 0 1 --latent2 0 0 4 --filter nearest,bilinear --pos lv1local --qat 2 --qes 0,8 --qes-start 0 --mlp 17,17 --leak 0.0009765625 --iters 5 --print-every 5 --out out_chk   # --qes on the block latent

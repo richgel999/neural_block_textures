@@ -44,7 +44,7 @@ model file stores the values as they are.
 **Bit-packed container (`--write-ntcb`).** Since September 7, 2026 the raw
 figure can be checked against a real file: with `--write-ntcb` the trainer
 also writes `<out>/model.ntcb`, a fixed-width container with no entropy
-coding (NTCB_PLAN.md section 1, NTCB_NOTES.md): a small header, then one
+coding ([NTCB_PLAN.md](NTCB_PLAN.md) section 1, [NTCB_NOTES.md](NTCB_NOTES.md)): a small header, then one
 section per latent level holding exactly the bits the raw figure charges (a
 `--qat` level its B-bit palette indices, a `--qes` level or a post-hoc
 quantized level its B-bit grid indices with the per-channel min/max as
@@ -70,14 +70,14 @@ carries an FNV-1a hash of the whole file and the section bodies carry sync
 markers at the start and end of every level body, every channel of a DCT
 body and the MLP body (the value also encodes the level and channel, so a
 marker of the right kind in the wrong section is refused too), so a truncated, edited or bit-shifted file is refused
-by name (NTCB_NOTES.md sections 3(f) and 9). Both readers accept the file in
+by name ([NTCB_NOTES.md](NTCB_NOTES.md) sections 3(f) and 9). Both readers accept the file in
 place of `model.bin`: `ntc --load model.ntcb` (same options as the run; a
 level stored on the post-hoc grid is restored as a frozen grid so the `done:`
 line reproduces the writing run's, and `--resave` writes it back as the
 continuous level it was) and `ntc_decode model.ntcb`, whose `file     :`
 line recomputes the simulator figure from the header and the decoded token
 stream and reports the same exact-match verdict (a `MISMATCH` exits 1
-there too). The containers written for the runs in NTCB_NOTES.md decode
+there too). The containers written for the runs in [NTCB_NOTES.md](NTCB_NOTES.md) decode
 byte-identically with the corresponding `model.bin` and come to 0.001–0.005
 bpp more than the raw figure (the header, section headers and markers).
 
@@ -217,9 +217,9 @@ plane snapped at iteration 0, decoder frozen; without `--dct-lambda 0` the
 recipe lambda applies and the snap truncates). The per-block map PNGs
 (`--dct-map`) colour each 8×8 block by its nonzero-AC count through a fixed
 ramp: 0 / 1 / 2 / 3-4 / 5-8 / 9-16 / 17-32 / 33-63 = black / navy / blue /
-cyan / green / yellow / orange / white. See DCT_MVP_PLAN.md and DCT_NOTES.md.
+cyan / green / yellow / orange / white. See [DCT_MVP_PLAN.md](DCT_MVP_PLAN.md) and [DCT_NOTES.md](DCT_NOTES.md).
 
-`--dct-lambda L` (September 7, 2026; DCT_RATE_PLAN.md, DCT_NOTES.md section
+`--dct-lambda L` (September 7, 2026; [DCT_RATE_PLAN.md](DCT_RATE_PLAN.md), [DCT_NOTES.md](DCT_NOTES.md) section
 8) puts a rate proxy into the loss, loss = mse + L · proxy bits / pixel with L
 in LSB² per bpp (0 = off: no term, no truncation, no change to any figure or
 file byte; the default was 0 until September 8, 2026 and is now the recipe
@@ -554,8 +554,8 @@ decoder reads. Every number in this section is from a log in the tree
 every run is on the GPU of the previous section, and the PSNR quoted is the
 one the standalone decoder measures on the packed file (Basis Universal's
 definition: 8-bit decoded against the 8-bit source over the source extent),
-never the trainer's. PROGRESS.md is the summary; DCT_NOTES.md sections 7-9,
-DCT_RATE_PLAN.md, BATTERY_NOTES.md and NTCB_NOTES.md sections 8-10 hold the
+never the trainer's. [PROGRESS.md](PROGRESS.md) is the summary; [DCT_NOTES.md](DCT_NOTES.md) sections 7-9,
+[DCT_RATE_PLAN.md](DCT_RATE_PLAN.md), [BATTERY_NOTES.md](BATTERY_NOTES.md) and [NTCB_NOTES.md](NTCB_NOTES.md) sections 8-10 hold the
 verification transcripts.
 
 **The DCT plane (`--dct-q Q`).** Level 0 (1-4 channels, nearest sampled,
@@ -630,8 +630,10 @@ build_cuda\Release\ntc.exe frymire.png --cuda --block 6 --latent 0 0 1 --latent2
 build\Release\ntc_decode.exe out_frymire_b6_dct80_c4_mlp17_lam0p5_init_8k\model.ntcb -o out_frymire_b6_dct80_c4_mlp17_lam0p5_init_8k\ntcb_decoded --compare frymire.png
 ```
 
-2. chief1 (516×516 padded) with the DCT plane at q 50: 31.77 dB at 4.776 bpp
-   raw, 2.145 order-0, 2.137 est, 2.046 ctx; 15.3 s.
+2. chief1 (516×516 padded) with the DCT plane at q 50: 34.71 dB at 5.152 bpp
+   raw, 2.332 order-0, 2.320 est, 2.198 ctx; 15.1 s (this and the two other
+   examples were re-run from this repository's build; the chief1 q 50 run
+   quoted elsewhere at 31.77 dB predates the shadow-pull default).
 
 ```
 build_cuda\Release\ntc.exe chief1.png --cuda --block 6 --latent 0 0 1 --latent2 0 0 4 --filter nearest,bilinear --pos lv1local --dct-q 50 --dct-refit 500 --qes 0,8 --mlp 17,17 --mlp-pairs 256 --iters 8000 --lr-anneal 0.5 0.05 --mlp-fd 0.5 --leak 0.0009765625 --dct-map all --lat-init-image --write-ntcb --out out_chief1_b6_dct50_c4_mlp17_lam0p5_init_8k
@@ -732,7 +734,7 @@ single-threaded figures are from the earlier decoder build).
 
 - The rate proxy works through the ES term, not the truncation. At the
   recipe lambda it beat lambda 0 on both axes at every q from 15 to 80 on
-  five of six battery images (BATTERY_NOTES.md), e.g. image3 q 50: 45.24 →
+  five of six battery images ([BATTERY_NOTES.md](BATTERY_NOTES.md)), e.g. image3 q 50: 45.24 →
   46.28 dB at 0.794 → 0.663 bpp order-0. Lambda 0.5 is the cap.
 - Plain rounding beats the XUASTC dead zone on this plane (model16 q 50:
   36.85 vs 35.95 dB; q 80: 38.42 vs 37.63; model9 q 95, good basin: 40.47
@@ -768,7 +770,7 @@ single-threaded figures are from the earlier decoder build).
   the visual gap; DCT errors are perceptual.
 
 **The container (`--write-ntcb`) and `ntc_decode`.** `model.ntcb` is the
-bit-packed file of NTCB_PLAN.md: a header with a whole-file hash, one
+bit-packed file of [NTCB_PLAN.md](NTCB_PLAN.md): a header with a whole-file hash, one
 fixed-width section per latent level (8-bit grid indices, searched selector
 palettes, or the DCT tokens as DC / run / magnitude / sign / EOB), the MLP
 in fp16, and 6-bit sync markers that encode section kind, level and channel;
@@ -809,7 +811,7 @@ iterations, latent quantized to 8 bits after training, MLP weights counted as fp
 
 These runs used the original positional encoding `uv,fourier:1` (`--nfreq 1`);
 the `uv`-only default scored 0.26–0.32 dB higher where both were run (see
-METHOD.md §10).
+[METHOD.md](METHOD.md) §10).
 
 The 128×128×8 run uses a 14 → 24 → 24 → 3 MLP (1035 weights, leaky ReLU,
 sigmoid output) and trains in about 150 s on a 32-thread CPU. Quantizing the
@@ -1048,7 +1050,7 @@ Useful options (`ntc --help` lists them all):
 | `--print-every N` | print the progress line every N iterations; default 0 = about once per second of wall time plus the last iteration (before September 6, 2026 the default was 10). Each print downloads the model and decodes the full image, so on the GPU a frequent cadence costs utilization |
 | `--save-every N` | write PNG snapshots (reconstruction + latent visualizations) every N iterations; default 0 = two snapshots, at the middle and the end of the run (before September 6, 2026 the default was 100) |
 | `--load model.bin --iters 0` | evaluate a saved model; add `--resave` to also write `<out>/model.bin` in the current file format (v12), which is how the tracked v5 material sample was converted in v0.8. A `model.ntcb` container is accepted in place of `model.bin` (same options as the run that wrote it) |
-| `--write-ntcb` | also write `<out>/model.ntcb`, the bit-packed container of NTCB_PLAN.md (no entropy coding; one fixed-width section per latent level plus fp16 MLP weights, a whole-file hash and sync markers) whose byte count is the raw bitrate; the final MLP weights are rounded to fp16 first (printed as an `ntcb :` line with the PSNR before and after) so `model.bin`, the PNGs, the `done:` line and the file agree; the `file:` line before `done:` reconciles the container's content bits with the bit simulator exactly (`[OK]` / `MISMATCH`, exit 1) and re-reads the file (`self-check OK`). Refused with `--block` above 255. `ntc_decode` reads the file and prints its own `file     :` line. Container version 2 since `--dct-deadzone`: a DCT level record carries one `dct_flags` byte (bit 0 = dead zone) after `dc_step`; both readers still accept version 1 (dead zone implied) (off) |
+| `--write-ntcb` | also write `<out>/model.ntcb`, the bit-packed container of [NTCB_PLAN.md](NTCB_PLAN.md) (no entropy coding; one fixed-width section per latent level plus fp16 MLP weights, a whole-file hash and sync markers) whose byte count is the raw bitrate; the final MLP weights are rounded to fp16 first (printed as an `ntcb :` line with the PSNR before and after) so `model.bin`, the PNGs, the `done:` line and the file agree; the `file:` line before `done:` reconciles the container's content bits with the bit simulator exactly (`[OK]` / `MISMATCH`, exit 1) and re-reads the file (`self-check OK`). Refused with `--block` above 255. `ntc_decode` reads the file and prints its own `file     :` line. Container version 2 since `--dct-deadzone`: a DCT level record carries one `dct_flags` byte (bit 0 = dead zone) after `dc_step`; both readers still accept version 1 (dead zone implied) (off) |
 | `--mlp-pairs`, `--mlp-batch`, `--mlp-sigma`, `--mlp-lr`, `--mlp-every`, `--lat-pairs`, `--lat-sigma`, `--lat-lr` | ES hyperparameters |
 | `--mlp-fd START`, `--mlp-fd-h H` | from START·iters, train the MLP by central finite differences per weight |
 
@@ -1163,7 +1165,7 @@ reference (36.32 / 36.83 dB against 36.67 dB). With `--qes` on, 500
 iterations on chief1 with `--rng hash` and the default `--qes-start 0.5`:
 CPU 31.30 dB against GPU 31.29 dB for `--qat 2 --qes 0,8` on the 8×8-block
 layout, and 26.95 against 26.94 dB for `--qes 6,8` on two bilinear levels,
-at identical bitrates (2.531 and 1.660 bpp raw; see QES_NOTES.md).
+at identical bitrates (2.531 and 1.660 bpp raw; see [QES_NOTES.md](QES_NOTES.md)).
 
 **Container round trip.** Since September 7, 2026 one `--write-ntcb` round
 trip is part of the check: the regression command with `--write-ntcb --out
@@ -1178,7 +1180,7 @@ from `out_reg_ntcb/model.bin`; `ntc --crop 512 --mlp-pairs 32 --load
 out_reg_ntcb/model.ntcb --iters 0` must print the writing run's `done:`
 figures (23.83 dB at 0.552 / 0.500 / 0.084 bpp). The figures, the 27-row
 settings matrix (every quantization mode, 1..4 textures, 2..3 levels, cell
-sizes 4..32, both backends) and the corruption cases are in NTCB_NOTES.md.
+sizes 4..32, both backends) and the corruption cases are in [NTCB_NOTES.md](NTCB_NOTES.md).
 
 Option validation is exercised by hand for each new flag (refusals for
 inconsistent settings, the mismatch message when a saved model does not
@@ -1289,7 +1291,7 @@ Implemented in this repository:
   v0.8; `uv`, `lv1local`, `none` remain).
 * Configurable decoder depth and width (leaky ReLU only since v0.8); saved models record the
   size of every latent level, MLP layout, activation, positional spec, and
-  texture count (not the output mapping or the loss weights; see METHOD.md §7).
+  texture count (not the output mapping or the loss weights; see [METHOD.md](METHOD.md) §7).
 * **Two-level latent pyramid** (added September 4, `--latent2`): a second latent texture sampled
   at the same UV and concatenated onto the first, trained with the same
   footprint attribution applied once per level. Measured at 3000 iterations,
@@ -1847,6 +1849,14 @@ selector plane, disclosed here as prior art:
   to be cheaper to code rather than coded after the fact; and
   **DCT-coding the block latent** itself with the same quantization-aware
   shadow / snap training as the selector plane.
+* **Decoder output spaces and losses matched to the texture kind:** the MLP
+  can output a normal map as a function of an axis / angle parameterization
+  (or another unit-vector encoding) instead of RGB, or output luma and chroma
+  in a colour space such as YCbCr, YCoCg, YCoCg-R or Oklab, with the training
+  target converted to the same space; and the loss can be an angular error
+  between decoded and source normals, or a channel-weighted error in one of
+  those colour spaces (for example a heavier luma weight in YCoCg), in place
+  of RGB MSE.
 * **Multi-spectral decomposition:** the selector information split into
   frequency bands, the lower bands DCT-coded at coarser resolution and the
   highest band searched or expander-coded, all feeding the one decoder.

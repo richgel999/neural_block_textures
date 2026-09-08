@@ -228,7 +228,7 @@ L = min(0.5, 7.5 S(q)²), see the flag table; the check lines below pin
 tokens the bit simulator counts (run and |q| at 2·⌊log2⌋ + 1 bits each, 1 per
 sign, 2 per EOB, the DC excluded), which tracks the order-0 AC bits to within a
 few percent on m1 at λ ≤ 80 (`proxy/h0` 0.98-1.02; the `dct rate` line prints
-it, and next to it the EOB-excluded ratio); on EOB-dominated streams (model11,
+it, and next to it the EOB-excluded ratio); on EOB-dominated streams (texture D,
 λ ≥ 320) the fixed 2-bit EOB overcharges an adaptive coder's fraction of a bit
 and the first ratio rises to 1.3-3.6. Two parts, both on by
 default and selectable with `--dct-rate es | trunc | both`: (A) the latent ES
@@ -467,10 +467,10 @@ bits per channel after the run (per-channel min/max, 64 header bits per
 channel); the PSNR quoted is that 8-bit evaluation. On the September 6 runs
 with a bilinear block latent (8×8 and 6×6 blocks, 27,27 decoders, 256 pairs,
 8000 iterations on the GPU) the post-hoc step costs 0.10 to 0.46 dB:
-image3 49.32 → 48.86 dB (`out_image3_b8_c1q4_c4bilin_mlp27_cuda8k_fd50.log`),
-model12 40.54 → 40.35 dB (`out_model12_b8_c1q2_c4bilin_mlp27_cuda8k_fd50.log`),
-image1 43.21 → 43.11 dB (`out_image1_b6_c1q3_c3bilin_mlp27_cuda8k_fd50.log`)
-and model11 41.56 → 41.45 dB (`out_model11_b6_c1q3_c3bilin_mlp27_cuda8k_fd50.log`).
+image3 49.32 → 48.86 dB,
+texture E 40.54 → 40.35 dB,
+image1 43.21 → 43.11 dB
+and texture D 41.56 → 41.45 dB.
 The trained values are heavy-tailed (image3's block latent ends at sd 1.612
 with max |v| 11.05, so the 8-bit step is coarse), and neither the selector
 search nor the decoder ever saw the values the shipping decoder receives.
@@ -524,9 +524,8 @@ ntc image3.png --cuda --block 8 --latent 0 0 1 --latent2 0 0 4 --filter nearest,
 | `--qes 8`, quantization-aware | 49.29 dB | 4.508 | 4.146 | 141.6 s |
 | `--qes 10`, quantization-aware `*` | 49.31 dB | 4.633 | 4.231 | 142.9 s |
 
-`*` the latest run. The first two rows are the same run
-(`out_image3_b8_c1q4_c4bilin_mlp27_cuda8k_fd50.log`); the other three are
-`out_image3_b8_c1q4_c4bilin_qes{6,8,10}_mlp27_cuda8k_fd50.log`. On 8×8 blocks
+`*` the latest run. The first two rows are the same run; the other three
+are separate runs at 6, 8 and 10 bits. On 8×8 blocks
 each block-latent channel bit costs 1/64 bpp, so the 4-channel latent moves
 the raw rate by 0.125 bpp per bit (4.383 / 4.508 / 4.633 at 6 / 8 / 10 bits).
 
@@ -666,16 +665,16 @@ over the source extent (`853×1280` for the `864×1296` models below).
 
 Of the images in this table only frymire and chief1 are in the repository
 (the test images shipped here are chief1, frymire, game1, game2, kodim01,
-kodim02, kodim23, m1-m4 and mario_512); the others are game textures and
-photos that cannot be redistributed. The PSNR column is the standalone
+kodim02, kodim23, m1-m4 and mario_512); the others are game textures
+(labelled texture A to K) and photos that cannot be redistributed. The PSNR column is the standalone
 decoder's figure on the packed file; the rates and the time are the
 trainer's `done:` line.
 
 | Image | Size (padded) | Plane | Level 1 | Decoder | PSNR (decoder) | raw | order-0 | est | ctx | Train |
 |---|---|---|---|---|---|---|---|---|---|---|
-| model13 | 864×1296 | 1 ch, q 80 | 1/6 × 4 | 7-17-17-3 = 496 | 43.92 dB | 4.523 | 2.039 | 1.856 | 1.959 | 30.5 s |
-| model8 | 1280×800 | 1 ch, q 80 | 1/4 × 4 | 7-17-17-3 = 496 | 45.87 dB | 4.293 | 2.560 | 2.035 | 2.485 | 28.5 s |
-| model8 | 1280×800 | 1 ch, q 99 | 1/4 × 4 | 7-17-17-3 = 496 | 49.23 dB | 8.923 | 4.135 | 3.599 | 3.932 | 29.3 s |
+| texture F | 864×1296 | 1 ch, q 80 | 1/6 × 4 | 7-17-17-3 = 496 | 43.92 dB | 4.523 | 2.039 | 1.856 | 1.959 | 30.5 s |
+| texture B | 1280×800 | 1 ch, q 80 | 1/4 × 4 | 7-17-17-3 = 496 | 45.87 dB | 4.293 | 2.560 | 2.035 | 2.485 | 28.5 s |
+| texture B | 1280×800 | 1 ch, q 99 | 1/4 × 4 | 7-17-17-3 = 496 | 49.23 dB | 8.923 | 4.135 | 3.599 | 3.932 | 29.3 s |
 | image4 (photo) | 1600×1200 | 1 ch, q 80 | 1/8 × 3 | 6-17-17-3 = 479 | 42.78 dB | 3.412 | 1.314 | 1.224 | 1.233 | 46.0 s |
 | image4 (photo) | 1600×1200 | 1 ch, q 20 | 1/8 × 3 | 6-17-17-3 = 479 | 39.93 dB | 1.201 | 0.583 | 0.504 | 0.563 | 44.2 s |
 | image4 (photo) | 1608×1200 | 1 ch, q 80 | 1/6 × 4 | 7-17-17-3 = 496 | 42.67 dB | 3.308 | 1.524 | 1.332 | 1.465 | 46.9 s |
@@ -685,35 +684,18 @@ trainer's `done:` line.
 | frymire | 1032×1032 | 1 ch, q 80 | 1/6 × 4 | 7-17-17-3 = 496 | 32.99 dB | 9.673 | 4.052 | 3.965 | 3.826 | 29.1 s |
 | zone | 3000×2016 | 1 ch, q 80 | 1/6 × 4 | 7-17-17-3 = 496 | 36.47 dB | 10.194 | 4.408 | 4.436 | 4.276 | 126.4 s |
 | doom | 1920×1080 | 1 ch, q 70 | 1/6 × 4 | 7-17-17-3 = 496 | 39.71 dB | 3.880 | 1.836 | 1.665 | 1.771 | 46.3 s |
-| model20 | 936×936 | 1 ch, q 90 | 1/6 × 4 | 7-17-17-3 = 496 | 43.88 dB | 6.646 | 3.290 | 3.166 | 3.042 | 24.8 s |
-| model21 | 960×960 | 1 ch, q 80 | 1/6 × 4 | 7-17-17-3 = 496 | 40.48 dB | 3.609 | 1.901 | 1.786 | 1.836 | 25.0 s |
-| model22 | 960×960 | 1 ch, q 80 | 1/6 × 4 | 7-17-17-3 = 496 | 40.84 dB | 6.027 | 2.586 | 2.486 | 2.412 | 26.0 s |
-| model19 | 864×1296 | 1 ch, q 80 | 1/6 × 4 | 7-17-17-3 = 496 | 41.94 dB | 4.876 | 2.282 | 2.097 | 2.163 | 29.1 s |
-| model19 | 864×1296 | 1 ch, q 80 | 1/6 × 4 | 7-11-11-3 = 256 | 39.42 dB | 4.486 | 1.972 | 1.806 | 1.874 | 22.7 s |
-| model19 | 864×1296 | 1 ch, q 80 | 1/6 × 4 | 7-7-7-3 = 136 | 40.56 dB | 4.684 | 2.116 | 1.970 | 1.998 | 19.1 s |
+| texture I | 936×936 | 1 ch, q 90 | 1/6 × 4 | 7-17-17-3 = 496 | 43.88 dB | 6.646 | 3.290 | 3.166 | 3.042 | 24.8 s |
+| texture J | 960×960 | 1 ch, q 80 | 1/6 × 4 | 7-17-17-3 = 496 | 40.48 dB | 3.609 | 1.901 | 1.786 | 1.836 | 25.0 s |
+| texture K | 960×960 | 1 ch, q 80 | 1/6 × 4 | 7-17-17-3 = 496 | 40.84 dB | 6.027 | 2.586 | 2.486 | 2.412 | 26.0 s |
+| texture H | 864×1296 | 1 ch, q 80 | 1/6 × 4 | 7-17-17-3 = 496 | 41.94 dB | 4.876 | 2.282 | 2.097 | 2.163 | 29.1 s |
+| texture H | 864×1296 | 1 ch, q 80 | 1/6 × 4 | 7-11-11-3 = 256 | 39.42 dB | 4.486 | 1.972 | 1.806 | 1.874 | 22.7 s |
+| texture H | 864×1296 | 1 ch, q 80 | 1/6 × 4 | 7-7-7-3 = 136 | 40.56 dB | 4.684 | 2.116 | 1.970 | 1.998 | 19.1 s |
 | normal_map | 512×512 | 2 ch, q 80,80 | 1/4 × 4 | 8-17-17-3 = 513 | 38.99 dB | 11.007 | 5.151 | 5.060 | 4.822 | 19.0 s |
 | normal_map | 512×512 | 2 ch, q 50,50 | 1/4 × 4 | 8-17-17-3 = 513 | 35.44 dB | 7.757 | 3.832 | 3.748 | 3.646 | 18.7 s |
 | normal_map | 512×512 | 2 ch, q 25,25 | 1/4 × 4 | 8-17-17-3 = 513 | 33.30 dB | 5.942 | 3.150 | 3.071 | 3.037 | 17.5 s |
 
 Rates are bpp; "Train" is the wall time of the 8000 GPU iterations from
-the `done:` line. The directories, in row order:
-`out_model13_b6_dct80_c4_lam0p5_init_pull01_8k`,
-`out_model8_b4_dct80_c4_lam0p5_init_pull01_8k`,
-`out_model8_b4_dct99_c4_lam0p003_init_pull01_8k`,
-`out_image4_b8_dct80_c3_mlp17_lam0p5_init_8k`,
-`out_image4_b8_dct20_c3_lam0p5_init_pull01_8k`,
-`out_image4_b6_dct80_c4_mlp17_lam0p5_init_8k`,
-`out_chroma_b6_dct30_c2_mlp17_lam0p5_init_8k`,
-`out_image5_b4_qat3_c3_mlp17_init_8k`,
-`out_image5_b4_dct80_c3_mlp17_lam0p5_init_8k`,
-`out_frymire_b6_dct80_c4_mlp17_lam0p5_init_8k`,
-`out_zone_b6_dct80_c4_mlp17_lam0p5_init_8k`,
-`out_doom_b6_dct70_c4_mlp17_lam0p5_init_8k`,
-`out_model20_b6_dct90_c4_mlp17_lam0p3_init_8k`,
-`out_model21_b6_dct80_c4_mlp17_lam0p5_init_8k`,
-`out_model22_b6_dct80_c4_mlp17_lam0p5_init_8k`,
-`out_model19_b6_dct80_c4_mlp{17,11,7}_lam0p5_init_8k`,
-`out_normal_map_b4_dct{80,50,25}x2_c4_mlp17_lam0p5_init_8k`. The model13
+the `done:` line. The texture F
 row is the config_a reference: 633,138 bytes on disk for 853×1280 texels.
 
 **Decoder timings** (`ntcb_decode.log`; SSE4.1, 32 threads on the CPU of
@@ -723,8 +705,8 @@ inverse DCT, file load and PNG encode):
 
 | Run | Inverse DCT of the plane | Decode, min ms | Mtexel/s |
 |---|---|---|---|
-| model13 q 80 (864×1296, 17,496 blocks) | 6.58 ms single-threaded | 2.614 | 428.35 |
-| model20 q 90 (936×936, 13,689 blocks) | 0.85 ms on 32 threads | 1.309 | 669.08 |
+| texture F q 80 (864×1296, 17,496 blocks) | 6.58 ms single-threaded | 2.614 | 428.35 |
+| texture I q 90 (936×936, 13,689 blocks) | 0.85 ms on 32 threads | 1.309 | 669.08 |
 | zone q 80 (3000×2016, 94,500 blocks) | 43.20 ms single-threaded | 9.247 | 654.03 |
 
 The inverse-DCT column is each log's `idct :` line as printed (the
@@ -736,25 +718,25 @@ single-threaded figures are from the earlier decoder build).
   recipe lambda it beat lambda 0 on both axes at every q from 15 to 80 on
   five of six battery images ([BATTERY_NOTES.md](BATTERY_NOTES.md)), e.g. image3 q 50: 45.24 →
   46.28 dB at 0.794 → 0.663 bpp order-0. Lambda 0.5 is the cap.
-- Plain rounding beats the XUASTC dead zone on this plane (model16 q 50:
-  36.85 vs 35.95 dB; q 80: 38.42 vs 37.63; model9 q 95, good basin: 40.47
+- Plain rounding beats the XUASTC dead zone on this plane (texture G q 50:
+  36.85 vs 35.95 dB; q 80: 38.42 vs 37.63; texture C q 95, good basin: 40.47
   vs 39.82).
 - The small decoder regularises the plane: with 1056 weights (27,27) the
   plane grows a per-block structure the decoder exploits through its
-  cell-UV input and the DCT codes badly; with 496 it stays smooth (model13
+  cell-UV input and the DCT codes badly; with 496 it stays smooth (texture F
   6×6 q 80: 42.26 vs 37.77 dB at less rate). Below that the trend is not
-  monotone: model19 gives 41.94 / 39.42 / 40.56 dB at 496 / 256 / 136
+  monotone: texture H gives 41.94 / 39.42 / 40.56 dB at 496 / 256 / 136
   weights.
-- The float phase can land in bad basins (model9 1/4 q 95: seeds 35.19 /
-  39.82 / 35.07; model13 q 80 seed 2: 37.42 vs 42.26). The luma start fixed
-  every bad seed tried (model13 seed 2 → 41.34, model9 seeds 1 / 3 → 40.03
+- The float phase can land in bad basins (texture C 1/4 q 95: seeds 35.19 /
+  39.82 / 35.07; texture F q 80 seed 2: 37.42 vs 42.26). The luma start fixed
+  every bad seed tried (texture F seed 2 → 41.34, texture C seeds 1 / 3 → 40.03
   / 40.30) and makes seeds agree within 0.1 dB.
-- The shadow pull: model4 1/4 3-ch q 25 32.16 → 34.43 dB (1.595 → 1.686
+- The shadow pull: texture A 1/4 3-ch q 25 32.16 → 34.43 dB (1.595 → 1.686
   est), q 50 33.78 → 36.28 (2.001 → 2.016), image4 q 20 38.31 → 39.93,
-  model13 q 80 41.42 → 43.92 (1.945 → 1.856), model9 q 95 37.99 → 38.34;
+  texture F q 80 41.42 → 43.92 (1.945 → 1.856), texture C q 95 37.99 → 38.34;
   pull 0.02 equals 0.01, 0.05 starts to cost, the reset alone
   (`--dct-shadow-reset`) gives half the gain.
-- Cell size sets the rate, q sets the plane: model11 q 30 lambda 60 at 1/4
+- Cell size sets the rate, q sets the plane: texture D q 30 lambda 60 at 1/4
   / 1/6 / 1/8 gives 38.28 dB @ 1.847 / 37.12 @ 1.019 / 36.48 @ 0.700 bpp
   order-0. On the photo (image4) 1/8 cells with 3 channels beat 1/6 with 4
   on both axes (42.78 @ 1.224 est vs 42.67 @ 1.332).
@@ -781,7 +763,7 @@ exactly (`file:` line, `[OK]`) and re-reads the file (`self-check OK`), and
 decoder reads nothing but the file:
 
 ```
-build\Release\ntc_decode.exe out_model13_b6_dct80_c4_lam0p5_init_pull01_8k\model.ntcb -o out_model13_b6_dct80_c4_lam0p5_init_pull01_8k\ntcb_decoded --compare model13.png
+build\Release\ntc_decode.exe out_frymire_b6_dct80_c4_mlp17_lam0p5_init_8k\model.ntcb -o out_frymire_b6_dct80_c4_mlp17_lam0p5_init_8k\ntcb_decoded --compare frymire.png
 ```
 
 writes `ntcb_decoded.png` at the source size and prints the `compare t0:`
@@ -956,7 +938,7 @@ with a message: layers wider than 64 and MLPs over 12k weights.
 cmake --preset cuda            # Visual Studio 2022 generator, CUDA 13.1 toolset, sm_120
 cmake --build build_cuda --config Release
 build_cuda\Release
-build_cuda\Release\ntc.exe model.png --cuda --latent 512 512 2 --latent2 128 128 4 --filter nearest,nearest --pos lv1local --qat 3,1 ...
+build_cuda\Release\ntc.exe chief1.png --cuda --latent 512 512 2 --latent2 128 128 4 --filter nearest,nearest --pos lv1local --qat 3,1 ...
 ```
 
 The preset pins the CUDA 13.1 toolset explicitly (`-T cuda=13.1`) because an
@@ -968,7 +950,8 @@ the selector search) and exits. `--rng hash` makes the CPU trainer draw its
 perturbations and minibatches from the same counter-based generator, so a
 CPU run and a `--cuda` run with the same seed follow the same ES sample and
 agree to display precision (kodim23, 200 iterations: 24.09 dB on both;
-model.png with 3,1-bit selectors, 300 iterations: 30.21 vs 30.22 dB). It
+chief1 with 3,1-bit selectors and a 128×128×4 block latent, 300 iterations:
+38.24 dB on the GPU vs 38.23 dB on the CPU). It
 also removes the platform dependence of `std::normal_distribution`.
 
 Test platform: NVIDIA GeForce RTX 5090 (32 GB, driver 581.80), CUDA 13.1
@@ -1027,7 +1010,7 @@ Useful options (`ntc --help` lists them all):
 | `--qat B` | hold level 0 on a 2^B-value grid in [-1,1] (B = 1..8) and update it by an exact exhaustive per-texel search instead of ES (off). Needs `--filter nearest` on level 0; level 1 (if any) and the MLP train as before. Model file v9; v10 adds per-channel bit depths, v11 (September 6, 2026) adds the decoded image size, the source size before `--block` padding and the `--clamp` flag so a standalone decoder needs nothing but the file; v12 (September 6, 2026) adds, per level, the `--qes` bit depth and the per-channel min/max ranges, with `--qes` levels stored as their on-grid values |
 | `--qes B` \| `--qes B0,B1[,B2]` | quantization-aware ES: hold every continuous (ES-trained) level, or the listed levels (0 = leave continuous), on a per-channel min/max grid of 2^B values (B = 2..12) during training (off). The level keeps training by ES on an fp32 shadow; every decode reads the snapped copy, the ES perturbation is added to the snapped point and the update goes to the shadow. A `--qat` level cannot also have `--qes`. The bitrate lines charge the level its B bits plus 64 header bits per channel, with the entropy over the grid indices; the quantized and fp32 PSNRs coincide once every level is discrete. Works with `--cuda` (`--cuda-check` compares the snapped copies exactly) |
 | `--qes-start F` | fit the per-channel ranges from the shadow and start snapping at iteration F·iters (default 0.5; 0 = from the first iteration, with the ranges of the initial draw); the ranges are frozen from then on and the shadow is clamped to them after every step (the refit / freeze schedule was removed in v0.8) |
-| `--lat-init-image` | start channel 0 of level 0 at the image's luma (mean over the textures) scaled to [-1, 1] instead of a Gaussian draw (off). Part of config_a: it removes the seed variance of the float phase (model13 q 80 seed 2: 37.42 dB without, 41.34 with) |
+| `--lat-init-image` | start channel 0 of level 0 at the image's luma (mean over the textures) scaled to [-1, 1] instead of a Gaussian draw (off). Part of config_a: it removes the seed variance of the float phase (texture F q 80 seed 2: 37.42 dB without, 41.34 with) |
 | `--dct-q Q` \| `--dct-q Q0,Q1[,Q2,Q3]` | experimental, off by default: level 0 is an 8×8 DCT-coded selector plane per channel (XUASTC's quantizer: JPEG luma table K.1, libjpeg quality scaling, dead zone α 0.5 with the first-order exemption, per-block 4-bit scale code from a decoder sensitivity probe). Q = 100: every AC step 1 (near lossless); Q = 1: coarsest; 0 = off; one value applies to every channel, a list gives each of the 1..4 channels of `--latent 0 0 C` its own quality (its own step tables, scale codes and symbol stream; the DC step is shared). Level 0 then has no bit depth and is charged by a bit simulator over the DC and zigzag run-length symbols (raw / order-0 / context; nothing is coded); with C > 1 `nz/blk` counts per (block, channel) and `bits/blk` is per block position summed over the channels, and the final block adds a `dct[c]` and a `dct codes[c]` line per channel whose raw / h0 / ctx totals sum to the level's. Needs `--filter nearest` on level 0, level 0 at full resolution and an image size that is a multiple of 8 (with `--block N` the padding multiple becomes lcm(N, 8)); replaces `--qat` on level 0; a single-value `--qes B` then applies to the levels >= 1. Model file v14 (magic `0x4E54433E`): the v12 layout plus N, DC step, C, the `--dct-deadzone` flag (one int, 0/1) and q per channel, int16 symbols and uint8 codes (`[block][channel]`, channel fastest), then the floats of levels >= 1; written only when the plane is live, refused by the loader without the same `--dct-q` list / `--dct-dc-step` / `--dct-deadzone` (v13, magic `0x4E54433D`, is the same layout without the flag int and loads as dead zone 1). `--load <v12> --dct-q Q --dct-lambda 0 --iters 0` probes a trained float-selector model at any Q without retraining (the recipe lambda would truncate at the snap). Works with `--cuda` (check 7 of `--cuda-check`, whose PASS line names the channel count) |
 | `--dct-start F` | fit the scale codes from the decoder sensitivity probe and start decoding from the DCT-snapped plane at iteration F·iters (default 0.5; 0 = from the start); the shadow is clamped to [-1,1] from the first iteration either way |
 | `--dct-refit N` | re-run the decoder sensitivity probe and replace the scale codes every N iterations after the switch, re-snapping level 0 from the kept shadow (default 500; 0 = fit once and freeze, the earlier behaviour); each refit logs the fraction of codes that moved by ≥ 1 / ≥ 2 and the PSNR before / after the re-snap; the model file stores the last refit's codes; `--cuda` uploads the new codes through `set_dct` |
@@ -1040,8 +1023,8 @@ Useful options (`ntc --help` lists them all):
 | `--dct-rate MODE` | `es` (part A only, the ES rate term), `trunc` (part B only, snap-time truncation) or `both` (default); no effect without `--dct-lambda` |
 | `--dct-lambda-lo W` | the two first-order ACs ((0,1) and (1,0), zigzag 1 and 2) cost W × their bits in the rate proxy, W in [0, 1], default 0.25: both the ES rate term and the truncation see them as cheap, so `--dct-lambda` discourages them four times less than the other coefficients (XUBC7 protects the same pair strongly at every quality). 1 = no protection (byte-identical to the unweighted proxy), 0 = never charged. Integer weighting `(token * round(16 W) + 8) >> 4` on both backends; no effect at `--dct-lambda 0` |
 | `--dct-deadzone 0\|1` | the AC quantizer of the DCT plane (default 0 since v0.12.3, plain rounding; a loaded DCT file's flag is adopted unless the option is given; the check lines below pass `--dct-deadzone 1` so their pinned figures hold): 1 = XUASTC's dead zone, α 0.5 (`\|d\| < L` → 0, `\|q\| = 1` covers [L, 2L) and dequantizes to 1.5 L), with the first-order pair (1,0), (0,1) rounding plainly; 0 = plain rounding `round(d / L)` with the ±1024 clamp and `q · L` back on every AC, i.e. every coefficient takes the first-order pair's path. The symbols, the rate proxy's costs and the truncation are unchanged in kind (they see symbols; the truncation's distortion term uses whichever dequantization is live), so `--dct-lambda` works with either. The flag is stored in the file (model v14, ntcb v2) and checked at `--load`; the banner's `dct :` line names the quantizer and the `done:` label reads `dz0` when off. Identical on both backends (check 7 of `--cuda-check`). Motivation: the dead zone's zero bin and its 1.5-step reconstruction of \|q\| = 1 are suspected of the mosquito noise at q 50-80 |
-| `--dct-shadow-pull F` | after every latent step while the DCT plane is live, move the level-0 shadow a fraction F toward its own snapped plane and re-snap (default 0.01 since v0.13; 0 = off), so coefficients below their quantizer step decay instead of random-walking under Adam until they cross the step: model4 1/4 q 25 32.16 → 34.43 dB, model13 q 80 41.42 → 43.92 dB; 0.02 equals 0.01, 0.05 starts to cost. Identical on both backends; not stored in the file |
-| `--dct-shadow-reset` | at every scale-code refit set the level-0 shadow equal to the snapped plane (a pull with F = 1 at the refits only; off). The weaker form of `--dct-shadow-pull`: about half its gain (model4 1/4 q 25: 33.37 dB against 34.43 with the pull) |
+| `--dct-shadow-pull F` | after every latent step while the DCT plane is live, move the level-0 shadow a fraction F toward its own snapped plane and re-snap (default 0.01 since v0.13; 0 = off), so coefficients below their quantizer step decay instead of random-walking under Adam until they cross the step: texture A 1/4 q 25 32.16 → 34.43 dB, texture F q 80 41.42 → 43.92 dB; 0.02 equals 0.01, 0.05 starts to cost. Identical on both backends; not stored in the file |
+| `--dct-shadow-reset` | at every scale-code refit set the level-0 shadow equal to the snapped plane (a pull with F = 1 at the refits only; off). The weaker form of `--dct-shadow-pull`: about half its gain (texture A 1/4 q 25: 33.37 dB against 34.43 with the pull) |
 | `--dct-selftest` | run the DCT transform / table / zigzag / quantizer (dead zone and plain rounding) / scale-code self-test and exit |
 | `--rng MODE` | ES noise source: `mt` (default, `std::mt19937`) or `hash` (the GPU backend's counter-based generator; CPU and `--cuda` runs then share their perturbations) |
 | `--cuda` | train on the GPU (same outputs and model file); `--cuda-check` compares the kernels against the CPU code and exits |
@@ -1713,13 +1696,13 @@ otherwise). The following are disclosed as public prior art.
   latent ES optimizes what will actually be stored. A **shadow pull** (each
   latent step moves the shadow 1% toward its own snapped plane) stops
   sub-threshold coefficients from random-walking under Adam until they cross
-  a quantizer step and appear at full amplitude: +2.3 dB on model4 (q 25,
-  32.16 to 34.43 dB at about equal rate), +2.5 dB on model13 (q 80, 41.42 to
+  a quantizer step and appear at full amplitude: +2.3 dB on texture A (q 25,
+  32.16 to 34.43 dB at about equal rate), +2.5 dB on texture F (q 80, 41.42 to
   43.92 dB, 1.945 to 1.856 bpp est). Initializing channel 0 of the plane
-  from the image luma removes the seed variance of the float phase (model13
+  from the image luma removes the seed variance of the float phase (texture F
   seed 2: 37.42 to 41.34 dB).
 * Plain rounding of every AC beats a dead-zone quantizer on this plane
-  (model16 q 50: 36.85 vs 35.95 dB); a dead zone reconstructs |q| = 1 too far
+  (texture G q 50: 36.85 vs 35.95 dB); a dead zone reconstructs |q| = 1 too far
   out and produces mosquito noise in the decoded texture.
 * **A rate proxy inside the ES objective:** loss = MSE + lambda * (proxy bits
   per pixel), where the proxy is the integer Exp-Golomb cost of the same
@@ -1738,8 +1721,8 @@ otherwise). The following are disclosed as public prior art.
 * **The decoder size regularizes the plane.** With ~1000 decoder weights the
   plane grows a per-block / per-cell structure that the decoder exploits
   through its cell-UV input and the DCT codes badly; with ~500 weights
-  (17,17 = 496) it stays smooth (model13 6×6 q 80: 42.26 vs 37.77 dB at less
-  rate). Halving again: model19 q 80 with 496 / 256 / 136 weights gives
+  (17,17 = 496) it stays smooth (texture F 6×6 q 80: 42.26 vs 37.77 dB at less
+  rate). Halving again: texture H q 80 with 496 / 256 / 136 weights gives
   41.94 / 39.42 / 40.56 dB. A 136-weight decoder (7-7-7-3) is a viable
   CPU-class decoder.
 * **Both level-0 modes are kept.** Searched per-texel bits win on fine
@@ -1766,7 +1749,7 @@ otherwise). The following are disclosed as public prior art.
 * A **standalone SSE4.1 CPU decoder** reads the file and produces RGB8
   (bilinear latent fetch, MLP, fast sigmoid, RGB8 pack), threaded in row
   strips; the inverse DCT of the plane runs on the same thread pool. On a
-  926×926 texture (model20, q 90): inverse DCT 0.85 ms, decode stage 1.31 ms
+  926×926 texture (texture I, q 90): inverse DCT 0.85 ms, decode stage 1.31 ms
   = 669 Mtexel/s on 32 threads. A Debug
   build of the decoder is byte-identical to the Release build on every
   container layout.
@@ -1784,13 +1767,13 @@ otherwise). The following are disclosed as public prior art.
 
 ### Results (decoder PSNR from the packed file; bpp est unless noted)
 
-* model13 config_a q 80: 43.92 dB at 1.856 bpp. model8 (1/4, 4 ch) q 80:
+* texture F config_a q 80: 43.92 dB at 1.856 bpp. texture B (1/4, 4 ch) q 80:
   45.87 dB at 2.035 (4.29 raw); q 99: 49.23 dB at 3.60. image4 (photo, 1/8,
   3 ch) q 80: 42.78 dB at 1.224. chroma with a 2-channel block latent, q 30:
   33.05 dB at 1.281. frymire q 80: 32.99 dB at 3.965 (9.673 raw). zone
   3000×2000 q 80: 36.47 dB at 4.436 (10.19 raw), 126 s of training. doom
-  1920×1080 q 70: 39.71 dB at 1.665 (3.880 raw), 46 s. model20 q 90: 43.88 dB
-  at 3.166. model21 q 80: 40.48 dB at 1.786. model22 q 80: 40.84 dB at 2.486.
+  1920×1080 q 70: 39.71 dB at 1.665 (3.880 raw), 46 s. texture I q 90: 43.88 dB
+  at 3.166. texture J q 80: 40.48 dB at 1.786. texture K q 80: 40.84 dB at 2.486.
 * A normal map with a 2-channel DCT plane and a 1/4, 4-channel block
   latent: q 80 38.99 dB at 5.060 (11.007 raw), q 50 35.44 dB at 3.748,
   q 25 33.30 dB at 3.071.
